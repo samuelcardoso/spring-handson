@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
-class SpringHandsonApplicationTests {
+class MovieServiceTest {
 	@Autowired
 	private lateinit var movieService: MovieService
 
