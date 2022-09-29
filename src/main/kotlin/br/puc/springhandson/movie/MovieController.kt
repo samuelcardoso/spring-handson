@@ -15,8 +15,10 @@ class MovieController(
 
     @GetMapping
     fun getMovies(
-        @RequestParam("first") first: Int?, @RequestParam("max") max: Int?,
-        @RequestParam("field") field: String?, @RequestParam("searchTerm") searchTerm: String?
+        @RequestParam("first") first: Int?,
+        @RequestParam("max") max: Int?,
+        @RequestParam("field") field: String?,
+        @RequestParam("searchTerm") searchTerm: String?
     ): List<Movie> {
         return movieService.getMovies(first, max, field, searchTerm)
     }

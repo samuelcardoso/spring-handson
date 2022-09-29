@@ -4,11 +4,11 @@ import javax.persistence.*
 
 @Entity
 data class Movie(
-    var director: String? = null,
-    var title: String? = null,
-    var genre: String? = null,
-    var rating: Int? = null,
-    var year: Int? = null
+    var director: String?,
+    var title: String?,
+    var genre: String?,
+    var rating: Int?,
+    var year: Int?
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
