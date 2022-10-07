@@ -1,1 +1,1 @@
-rootProject.name = "spring-handson"
+rootProject.name = "track-ms"
