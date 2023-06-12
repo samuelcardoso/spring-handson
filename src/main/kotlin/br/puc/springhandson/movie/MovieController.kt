@@ -45,6 +45,11 @@ class MovieController(
         return movieService.count(field, searchTerm)
     }
 
+    @PostMapping("generatescript")
+    fun generateScript(@RequestBody movie: Movie): String? {
+        return movieService.generateScript(movie.title!!)
+    }
+
     @PostMapping("load")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     fun load() {

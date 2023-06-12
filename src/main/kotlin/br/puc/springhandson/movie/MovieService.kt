@@ -1,6 +1,12 @@
 package br.puc.springhandson.movie
 
+import com.theokanning.openai.completion.chat.ChatCompletionRequest
+import com.theokanning.openai.completion.chat.ChatMessage
+import com.theokanning.openai.completion.chat.ChatMessageRole
+import com.theokanning.openai.service.OpenAiService
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import java.time.Duration
 import javax.persistence.EntityManager
 import javax.persistence.TypedQuery
 import javax.persistence.criteria.*
@@ -9,7 +15,9 @@ import javax.transaction.Transactional
 
 @Service
 class MovieService(
-    val entityManager: EntityManager
+    val entityManager: EntityManager,
+    @Value("\${OPENAI_KEY}")
+    val keyOpenAI: String
 ) {
     fun find(id: Long?): Movie = entityManager.find(Movie::class.java, id)
 
@@ -23,6 +31,22 @@ class MovieService(
     fun deleteMovie(id: Long) {
         val movie: Movie = entityManager.find(Movie::class.java, id)
         return entityManager.remove(movie)
+    }
+
+    fun generateScript(title: String): String? {
+        val service = OpenAiService(keyOpenAI, Duration.ofSeconds(60))
+        val messages: MutableList<ChatMessage> = ArrayList()
+        messages.add(ChatMessage(ChatMessageRole.USER.value(),
+                "Gere um poema com no máximo 10 estrofes sobre $title"))
+        val chatCompletionRequest = ChatCompletionRequest
+                .builder()
+                .model("gpt-3.5-turbo")
+                .messages(messages)
+                .n(1)
+                .stream(false)
+                .build()
+        val completionChoice = service.createChatCompletion(chatCompletionRequest).choices[0]
+        return completionChoice.message.content
     }
 
     fun getMovies(firstResult: Int?, maxResults: Int?, field: String?, searchTerm: String?): List<Movie> {
