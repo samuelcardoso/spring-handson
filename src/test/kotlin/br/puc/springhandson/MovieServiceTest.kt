@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
 class MovieServiceTest {
+
 	@Autowired
 	private lateinit var movieService: MovieService
 

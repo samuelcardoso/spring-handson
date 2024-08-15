@@ -24,15 +24,13 @@ class MovieController(
     }
 
     @PostMapping
-    fun addMovie(movie: Movie): Movie {
-        movieService.addMovie(movie)
-        return movie
+    fun addMovie(@RequestBody movie: Movie): Movie? {
+        return movieService.addMovie(movie)
     }
 
     @PutMapping("{id}")
-    fun editMovie(movie: Movie): Movie {
-        movieService.editMovie(movie)
-        return movie
+    fun editMovie(@PathVariable("id") id: Long, @RequestBody movie: Movie): Movie? {
+        return movieService.editMovie(id, movie)
     }
 
     @DeleteMapping("{id}")

@@ -1,6 +1,6 @@
-package br.puc.springhandson.movie;
+package br.puc.springhandson.movie
 
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 data class Movie(

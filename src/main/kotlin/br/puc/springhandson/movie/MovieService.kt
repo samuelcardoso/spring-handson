@@ -1,11 +1,11 @@
 package br.puc.springhandson.movie
 
 import org.springframework.stereotype.Service
-import javax.persistence.EntityManager
-import javax.persistence.TypedQuery
-import javax.persistence.criteria.*
-import javax.persistence.metamodel.EntityType
-import javax.transaction.Transactional
+import jakarta.persistence.EntityManager
+import jakarta.persistence.TypedQuery
+import jakarta.persistence.criteria.*
+import jakarta.persistence.metamodel.EntityType
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class MovieService(
@@ -14,10 +14,24 @@ class MovieService(
     fun find(id: Long?): Movie = entityManager.find(Movie::class.java, id)
 
     @Transactional
-    fun addMovie(movie: Movie?) = entityManager.persist(movie)
+    fun addMovie(movie: Movie?): Movie? {
+        entityManager.persist(movie)
+        return movie
+    }
 
     @Transactional
-    fun editMovie(movie: Movie?) = entityManager.merge(movie)
+    fun editMovie(id: Long?, updatedMovie: Movie?): Movie? {
+        val existingMovie: Movie = entityManager.find(Movie::class.java, id)
+        if (updatedMovie != null) {
+            existingMovie.title = updatedMovie.title
+            existingMovie.director = updatedMovie.director
+            existingMovie.genre = updatedMovie.genre
+            existingMovie.rating = updatedMovie.rating
+            existingMovie.year = updatedMovie.year
+            entityManager.merge(existingMovie)
+        }
+        return existingMovie
+    }
 
     @Transactional
     fun deleteMovie(id: Long) {
@@ -30,12 +44,16 @@ class MovieService(
         val cq: CriteriaQuery<Movie> = qb.createQuery(Movie::class.java)
         val root: Root<Movie> = cq.from(Movie::class.java)
         val type: EntityType<Movie> = entityManager.metamodel.entity(Movie::class.java)
-        if (field != null && searchTerm != null && "" != field.trim { it <= ' ' } && "" != searchTerm.trim { it <= ' ' }) {
+
+        if (field != null && searchTerm != null && field.trim().isNotEmpty() && searchTerm.trim().isNotEmpty()) {
             val path: Path<String> =
-                root.get(type.getDeclaredSingularAttribute(field.trim { it <= ' ' }, String::class.java))
-            val condition: Predicate = qb.like(path, "%" + searchTerm.trim { it <= ' ' } + "%")
+                root.get(type.getDeclaredSingularAttribute(field.trim(), String::class.java))
+            val condition: Predicate = qb.like(path, "%" + searchTerm.trim() + "%")
             cq.where(condition)
         }
+
+        cq.orderBy(qb.asc(root.get<Long>("id")))
+
         val q: TypedQuery<Movie> = entityManager.createQuery(cq)
         if (maxResults != null) {
             q.maxResults = maxResults
@@ -45,6 +63,7 @@ class MovieService(
         }
         return q.resultList
     }
+
 
     fun count(field: String?, searchTerm: String?): Int {
         val qb: CriteriaBuilder = entityManager.criteriaBuilder
